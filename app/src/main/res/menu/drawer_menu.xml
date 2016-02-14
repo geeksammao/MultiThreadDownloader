@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/drawer_downloading"
+            android:checked="true"
+            android:icon="@drawable/ic_downloading"
+            android:title="@string/downloading"/>
+        <item
+            android:id="@+id/drawer_downloaded"
+            android:icon="@drawable/ic_downloaded"
+            android:title="@string/downloaded"/>
+        <item
+            android:id="@+id/drawer_setting"
+            android:icon="@drawable/ic_settings"
+            android:title="@string/drawer_setting"/>
+
+    </group>
+</menu>

@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">MyDownloader</string>
+    <string name="action_settings">Settings</string>
+    <string name="downloading">Downloading</string>
+    <string name="downloaded">Downloaded</string>
+    <string name="drawer_setting">Setting</string>
+    <string name="username">Sam Mao</string>
+    <string name="email">geeksammao@gmail.com</string>
+    <string name="title_activity_base">BaseActivity</string>
+
+    <string-array name="titles">
+        <item>Downloading</item>
+        <item>Downloaded</item>
+        <item>Setting</item>
+    </string-array>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="input_dialog_title">Link</string>
+    <string name="dialog_edittext_hint">Please input the download link</string>
+    <string name="dialog_positive">OK</string>
+    <string name="title_activity_new_process">NewProcessActivity</string>
+    <string name="title_activity_activity_b">ActivityB</string>
+    <string name="title_activity_activity_c">ActivityC</string>
+</resources>

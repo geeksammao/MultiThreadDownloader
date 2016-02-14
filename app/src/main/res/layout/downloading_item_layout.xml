@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="88dp">
+
+    <ImageView
+        android:id="@+id/down_item_imv"
+        android:layout_width="@dimen/download_item_image"
+        android:layout_height="@dimen/download_item_image"
+        android:layout_centerVertical="true"
+        android:src="@drawable/ic_downloading"/>
+
+    <ProgressBar
+        android:id="@+id/down_item_prgb"
+        style="@android:style/Widget.DeviceDefault.ProgressBar.Horizontal"
+        android:layout_width="272dp"
+        android:layout_height="8dp"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="8dp"
+        android:layout_toEndOf="@id/down_item_imv"
+        android:layout_toRightOf="@id/down_item_imv"
+        android:max="100"
+        android:progress="0"/>
+
+    <ImageView
+        android:id="@+id/down_item_toggle_imv"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_toEndOf="@id/down_item_prgb"
+        android:layout_toRightOf="@id/down_item_imv"
+        android:src="@drawable/pause"/>
+
+    <TextView
+        android:id="@+id/down_item_filesize_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/down_item_prgb"
+        android:layout_marginLeft="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_toRightOf="@id/down_item_imv"
+        android:textSize="16sp"
+        tools:text="32MB"
+        />
+
+    <TextView
+        android:id="@+id/down_speed_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/down_item_prgb"
+        android:layout_marginRight="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_toLeftOf="@id/down_item_toggle_imv"
+        android:textSize="16sp"
+        tools:text="25kb/s"
+        />
+
+    <TextView
+        android:id="@+id/down_percent_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/down_item_prgb"
+        android:layout_marginBottom="2dp"
+        android:layout_marginRight="4dp"
+        android:layout_toLeftOf="@id/down_item_toggle_imv"
+        android:textSize="16sp"
+        tools:text="25%"
+        />
+
+    <TextView
+        android:id="@+id/down_item_filename_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/down_item_prgb"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="16dp"
+        android:textSize="18sp"
+        tools:text="xxx.apk"
+        />
+</RelativeLayout>
