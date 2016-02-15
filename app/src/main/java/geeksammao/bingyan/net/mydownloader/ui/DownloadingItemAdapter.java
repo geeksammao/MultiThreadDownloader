@@ -14,7 +14,7 @@ import geeksammao.bingyan.net.mydownloader.model.DownloadInfo;
 /**
  * Created by Geeksammao on 11/28/15.
  */
-public class DownloadingItemAdapter extends RecyclerView.Adapter<DownloadItemViewHolder> {
+public class DownloadingItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private MainActivity activity;
     private List<DownloadInfo> downloadInfoList;
 
@@ -24,36 +24,61 @@ public class DownloadingItemAdapter extends RecyclerView.Adapter<DownloadItemVie
     }
 
     @Override
-    public DownloadItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View rootView = LayoutInflater.from(activity).inflate(R.layout.downloading_item_layout, parent, false);
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        RecyclerView.ViewHolder viewHolder = null;
 
-        return new DownloadItemViewHolder(rootView, activity);
+        switch (viewType){
+            case DownloadInfo.DOWNLOAD_ONGOING:
+                View downloadingRootView = LayoutInflater.from(activity).inflate(R.layout.downloading_item_layout, parent, false);
+                viewHolder  = new DownloadingItemViewHolder(downloadingRootView);
+                break;
+            case DownloadInfo.DOWNLOAD_FINISH:
+                View downloadedRootView = LayoutInflater.from(activity).inflate(R.layout.downloaded_item_layout, parent, false);
+                viewHolder = new DownloadedItemViewHolder(downloadedRootView);
+                break;
+        }
+
+        return viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(DownloadItemViewHolder holder, int position) {
-        int progress = downloadInfoList.get(position).progress;
-        long downloadSpeed = downloadInfoList.get(position).downloadSpeed;
-        double fileSize = downloadInfoList.get(position).fileSize;
-        String fileName = downloadInfoList.get(position).fileName;
-        Bitmap fileImage = downloadInfoList.get(position).fileImageBitmap;
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        switch (holder.getItemViewType()){
+            case DownloadInfo.DOWNLOAD_ONGOING:
+                DownloadingItemViewHolder downloadingItemViewHolder = (DownloadingItemViewHolder)holder;
 
-        holder.setProgress(progress);
-        holder.setFileSize(fileSize);
-        holder.setFileName(fileName);
-        holder.setDownloadSpeed(downloadSpeed);
-        holder.setDownloadProgressTv(progress);
-        if (fileImage != null){
-            holder.setFileImageView(fileImage);
-        } else {
-            // set the image according to the file suffix
-            holder.setFileImageView(fileName);
+                int progress = downloadInfoList.get(position).progress;
+                long downloadSpeed = downloadInfoList.get(position).downloadSpeed;
+                double fileSize = downloadInfoList.get(position).fileSize;
+                String fileName = downloadInfoList.get(position).fileName;
+                Bitmap fileImage = downloadInfoList.get(position).fileImageBitmap;
+
+                downloadingItemViewHolder.setProgress(progress);
+                downloadingItemViewHolder.setFileSize(fileSize);
+                downloadingItemViewHolder.setFileName(fileName);
+                downloadingItemViewHolder.setDownloadSpeed(downloadSpeed);
+                downloadingItemViewHolder.setDownloadProgressTv(progress);
+                if (fileImage != null){
+                    downloadingItemViewHolder.setFileImageView(fileImage);
+                } else {
+                    // set the image according to the file suffix
+                    downloadingItemViewHolder.setFileImageView(fileName);
+                }
+                break;
+
+            case DownloadInfo.DOWNLOAD_FINISH:
+                break;
         }
     }
 
     @Override
     public int getItemCount() {
         return downloadInfoList.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return downloadInfoList.get(position).downloadState;
     }
 
     public void setDownloadInfoList(List<DownloadInfo> list){

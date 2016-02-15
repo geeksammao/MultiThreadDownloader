@@ -5,7 +5,6 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -47,11 +46,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private ProgressDialog progressDialog;
     private RecyclerView downloadItemRecyclerView;
     private DownloadingItemAdapter recyclerAdaper;
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-    }
 
     @Override
     protected void setContentView() {
@@ -168,7 +162,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                                                     downloadItemRecyclerView.setAdapter(recyclerAdaper);
                                                 } else {
                                                     recyclerAdaper.setDownloadInfoList(downloadInfoList);
-                                                    recyclerAdaper.notifyDataSetChanged();
+//                                                    recyclerAdaper.notifyDataSetChanged();
+                                                    recyclerAdaper.notifyItemInserted(downloaderList.size());
                                                 }
                                             }
                                         });

@@ -12,7 +12,7 @@ import geeksammao.bingyan.net.mydownloader.R;
 /**
  * Created by Geeksammao on 11/28/15.
  */
-public class DownloadItemViewHolder extends RecyclerView.ViewHolder {
+public class DownloadingItemViewHolder extends RecyclerView.ViewHolder {
     private ImageView fileImageView;
     private ImageView toggleButtonImageView;
     private ProgressBar progressBar;
@@ -22,7 +22,7 @@ public class DownloadItemViewHolder extends RecyclerView.ViewHolder {
     private TextView downloadProgressTv;
     private boolean isPause;
 
-    public DownloadItemViewHolder(View itemView, final MainActivity context) {
+    public DownloadingItemViewHolder(View itemView) {
         super(itemView);
 
         isPause = false;
@@ -39,11 +39,11 @@ public class DownloadItemViewHolder extends RecyclerView.ViewHolder {
             @Override
             public void onClick(View v) {
                 if (isPause) {
-                    toggleButtonImageView.setImageDrawable(context.getResources().getDrawable(R.drawable.play));
                     // start
+                    toggleButtonImageView.setImageResource(R.drawable.play);
                 } else {
-                    toggleButtonImageView.setImageDrawable(context.getResources().getDrawable(R.drawable.pause));
                     // pause
+                    toggleButtonImageView.setImageResource(R.drawable.pause);
                 }
             }
         });
