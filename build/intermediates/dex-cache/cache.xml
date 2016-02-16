@@ -1,2 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
-<items version="2" />
+<items version="2" >
+
+    <item
+        jar="/Users/Geeksammao/Work/MultiThreadDownloader/app/build/intermediates/incremental-classes/debug/classes.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="4b74030bc23a2886d2e1c2fc46aef3ad69c4f8d6">
+        <dex dex="/Users/Geeksammao/Work/MultiThreadDownloader/app/build/intermediates/transforms/dex/debug/folders/1000/10/classes_d15d1fa7459a09c8f0205045bbf2353732e83592/classes.dex" />
+    </item>
+    <item
+        jar="/Users/Geeksammao/Work/MultiThreadDownloader/app/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.1/jars/classes.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="6cbc7773921fcfedbe55657578f0cbfe614778dc">
+        <dex dex="/Users/Geeksammao/Work/MultiThreadDownloader/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-support-v4-23.1.1_ede53745499402b52527a6a3b42fbcc057a605ef/classes.dex" />
+    </item>
+    <item
+        jar="/Users/Geeksammao/Work/MultiThreadDownloader/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.1.1/jars/classes.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="5c5699834e9722f1c288fea2de82725d078ba127">
+        <dex dex="/Users/Geeksammao/Work/MultiThreadDownloader/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-appcompat-v7-23.1.1_18bda9df4ed43e536de3a29b03aa8ace30118771/classes.dex" />
+    </item>
+    <item
+        jar="/Users/Geeksammao/Work/MultiThreadDownloader/app/build/intermediates/exploded-aar/de.hdodenhof/circleimageview/2.0.0/jars/classes.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="031e8b3ab2df4ab43b1017f84417d7e10dfbb8d2">
+        <dex dex="/Users/Geeksammao/Work/MultiThreadDownloader/app/build/intermediates/transforms/dex/debug/folders/1000/10/de.hdodenhof-circleimageview-2.0.0_5357a3a6e4f250a5db66aa2e3ef95f0b611d60e2/classes.dex" />
+    </item>
+    <item
+        jar="/Users/Geeksammao/Work/MultiThreadDownloader/app/libs/universal-image-loader-1.9.5.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="442dbfb517b9ab5cb5c6da7ebf8cc28ec5bd0375">
+        <dex dex="/Users/Geeksammao/Work/MultiThreadDownloader/app/build/intermediates/transforms/dex/debug/folders/1000/2/universal-image-loader-1.9.5_07378ac6638a42e7cb01efdbe2a10448f0037f55/classes.dex" />
+    </item>
+    <item
+        jar="/Users/Geeksammao/.gradle/caches/modules-2/files-2.1/com.android.databinding/baseLibrary/2.0.0-beta2/4da6968c4754e0229a9a80d8435d4e1aeb93bfec/baseLibrary-2.0.0-beta2.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="4da6968c4754e0229a9a80d8435d4e1aeb93bfec">
+        <dex dex="/Users/Geeksammao/Work/MultiThreadDownloader/app/build/intermediates/transforms/dex/debug/folders/1000/10/baseLibrary-2.0.0-beta2_48bc8bccfa61d66425b47dcbbf7fee7c8cb59479/classes.dex" />
+    </item>
+    <item
+        jar="/Users/Geeksammao/Work/MultiThreadDownloader/app/build/intermediates/exploded-aar/com.android.support/support-v4/23.1.1/jars/libs/internal_impl-23.1.1.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="a4de9c81ae239414e1ed0f86441b02abaf29bca9">
+        <dex dex="/Users/Geeksammao/Work/MultiThreadDownloader/app/build/intermediates/transforms/dex/debug/folders/1000/10/internal_impl-23.1.1_86288f2cd2968e382bb69f7dc279c6a2b722a733/classes.dex" />
+    </item>
+    <item
+        jar="/Users/Geeksammao/Work/MultiThreadDownloader/app/build/intermediates/exploded-aar/com.android.support/design/23.1.1/jars/classes.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="379471b2bd17d9737c050345c08e8c7d16589784">
+        <dex dex="/Users/Geeksammao/Work/MultiThreadDownloader/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-design-23.1.1_a75c81bbf99eebe5971a80ba7375c09ca7c6129f/classes.dex" />
+    </item>
+    <item
+        jar="/Users/Geeksammao/Work/MultiThreadDownloader/app/build/intermediates/exploded-aar/com.android.databinding/adapters/1.0-rc5/jars/classes.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="09804ef3ea3b68a21f819f06e68877fe441f958c">
+        <dex dex="/Users/Geeksammao/Work/MultiThreadDownloader/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.databinding-adapters-1.0-rc5_e9d84d788fcb1ae00c4cee3e3caf3d19441b25c9/classes.dex" />
+    </item>
+    <item
+        jar="/Users/Geeksammao/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp/okhttp/2.5.0/4de2b4ed3445c37ec1720a7d214712e845a24636/okhttp-2.5.0.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="4de2b4ed3445c37ec1720a7d214712e845a24636">
+        <dex dex="/Users/Geeksammao/Work/MultiThreadDownloader/app/build/intermediates/transforms/dex/debug/folders/1000/10/okhttp-2.5.0_8fce5aaae9b05ac05ba8e43379546ceb6bcb8acd/classes.dex" />
+    </item>
+    <item
+        jar="/Users/AndroidSDK/android-sdk-macosx/extras/android/m2repository/com/android/support/support-annotations/23.1.1/support-annotations-23.1.1.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="8d680ba5a623724d1fb0e81c36a790f023a6cede">
+        <dex dex="/Users/Geeksammao/Work/MultiThreadDownloader/app/build/intermediates/transforms/dex/debug/folders/1000/10/support-annotations-23.1.1_d4ec7814fa4bbd22a142bd3b19a9cc25050b4dd0/classes.dex" />
+    </item>
+    <item
+        jar="/Users/Geeksammao/Work/MultiThreadDownloader/app/build/intermediates/exploded-aar/com.android.databinding/library/1.0-rc5/jars/classes.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="83118a37ee518f1068b6aefab176a83a25761e52">
+        <dex dex="/Users/Geeksammao/Work/MultiThreadDownloader/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.databinding-library-1.0-rc5_d77a7e5c8b3c64c6fe9049db8ce3d939ae754d06/classes.dex" />
+    </item>
+    <item
+        jar="/Users/Geeksammao/Work/MultiThreadDownloader/app/build/intermediates/incremental-runtime-classes/debug/instant-run.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="d645a25a9325b1c83f21e466e192163929dc7296">
+        <dex dex="/Users/Geeksammao/Work/MultiThreadDownloader/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run_636ff72e2770da4e66807994be1a8ca7eb87d2d8/classes.dex" />
+    </item>
+    <item
+        jar="/Users/Geeksammao/Work/MultiThreadDownloader/app/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/23.1.1/jars/classes.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="09c5e804bc67fc0580360043dff067df574a60d4">
+        <dex dex="/Users/Geeksammao/Work/MultiThreadDownloader/app/build/intermediates/transforms/dex/debug/folders/1000/10/com.android.support-recyclerview-v7-23.1.1_02e0f65397a337d6684f1b0806d1043427a2bdd2/classes.dex" />
+    </item>
+    <item
+        jar="/Users/Geeksammao/.gradle/caches/modules-2/files-2.1/com.squareup.okio/okio/1.6.0/98476622f10715998eacf9240d6b479f12c66143/okio-1.6.0.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="98476622f10715998eacf9240d6b479f12c66143">
+        <dex dex="/Users/Geeksammao/Work/MultiThreadDownloader/app/build/intermediates/transforms/dex/debug/folders/1000/10/okio-1.6.0_241db0bb66ff0dc48adea30c9600afe4901ace8e/classes.dex" />
+    </item>
+
+</items>

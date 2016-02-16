@@ -6,8 +6,10 @@ import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Environment;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -43,6 +45,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private NetspeedDetector netspeedDetector = new NetspeedDetector(this);
 
     private DrawerLayout drawerLayout;
+    private CoordinatorLayout container;
     private ProgressDialog progressDialog;
     private RecyclerView downloadItemRecyclerView;
     private DownloadingItemAdapter recyclerAdaper;
@@ -81,6 +84,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         }
         progressDialog = new ProgressDialog(MainActivity.this, ProgressDialog.STYLE_SPINNER);
 
+        container = (CoordinatorLayout) findViewById(R.id.content);
         downloadItemRecyclerView = (RecyclerView) findViewById(R.id.down_item_rv);
         downloadItemRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         downloadItemRecyclerView.setAdapter(recyclerAdaper);
@@ -125,7 +129,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         dialog.show();
     }
 
-    private void startDownload(EditText editText) {
+    private void startDownload(final EditText editText) {
         String link = editText.getText().toString();
         File saveDir = Environment.getExternalStorageDirectory();
 
@@ -152,6 +156,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
                         DownloadInfo downloadInfo = new DownloadInfo();
                         downloadInfo.progress = progress;
+                        downloadInfo.url = editText.getText().toString();
                         downloadInfo.fileName = downloadManager.getFileName();
                         downloadInfo.fileSize = downloadManager.getFileLength();
                         downloadInfo.downloadSpeed = netspeedDetector.getNetworkSpeed();
@@ -194,6 +199,14 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             public void onDownloadError() {
                 progressDialog.setCancelable(true);
                 progressDialog.dismiss();
+
+                Snackbar.make(container, "Download failed.", Snackbar.LENGTH_LONG).
+                        setAction("Retry", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                startDownload(editText);
+                            }
+                        }).show();
             }
         });
     }

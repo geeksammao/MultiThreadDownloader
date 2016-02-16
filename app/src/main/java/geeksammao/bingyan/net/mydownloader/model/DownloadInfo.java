@@ -13,6 +13,7 @@ public class DownloadInfo {
     public int progress;
     public long downloadSpeed;
     public double fileSize;
+    public String url;
     public String fileName;
     public Bitmap fileImageBitmap;
     public int downloadState = DOWNLOAD_ONGOING;
