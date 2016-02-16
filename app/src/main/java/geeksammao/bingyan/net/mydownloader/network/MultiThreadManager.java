@@ -26,7 +26,7 @@ public class MultiThreadManager {
     private ExecutorService taskExecutorService = Executors.newFixedThreadPool(CORE_NUM + 1);
 
     private int threadNum;
-    private String targetUrl;
+    private  String targetUrl;
     private boolean isExist;
     private long fileLength;
     private int downloadedLength;

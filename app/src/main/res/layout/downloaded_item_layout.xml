@@ -1,7 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="88dp">
 
-</LinearLayout>
+    <ImageView
+        android:id="@+id/down_item_imv"
+        android:layout_width="@dimen/download_item_image"
+        android:layout_height="@dimen/download_item_image"
+        android:layout_centerVertical="true"
+        android:src="@drawable/ic_downloading"/>
+
+    <TextView
+        android:id="@+id/down_item_toggle_imv"
+        android:layout_width="128dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="4dp"
+        android:layout_toEndOf="@id/down_item_prgb"
+        android:layout_toRightOf="@id/down_item_imv"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:textSize="14sp"
+        tools:text="www.baidu.com"
+        />
+
+    <TextView
+        android:id="@+id/down_item_filesize_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="24dp"
+        android:layout_marginBottom="14dp"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@id/down_item_imv"
+        android:textSize="14sp"
+        tools:text="32MB"
+        />
+
+    <TextView
+        android:id="@+id/down_speed_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="4dp"
+        android:layout_marginBottom="14dp"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@id/down_item_toggle_imv"
+        android:textSize="16sp"
+        tools:text="25kb/s"
+        />
+</RelativeLayout>

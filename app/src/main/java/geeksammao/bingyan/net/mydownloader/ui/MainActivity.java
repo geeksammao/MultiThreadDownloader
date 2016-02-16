@@ -117,69 +117,85 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                String link = editText.getText().toString();
-                                File saveDir = Environment.getExternalStorageDirectory();
-
-                                final MultiThreadManager downloadManager = new MultiThreadManager(threadNum, link, saveDir, MainActivity.this);
-                                downloaderList.add(downloadManager);
-
-                                downloadManager.fetchDownloadFileLength(new OnDownloadCallback() {
-                                    @Override
-                                    public void onPreDownload() {
-                                        progressDialog.setTitle("Download info");
-                                        progressDialog.setMessage("Start downloading");
-                                        progressDialog.setCancelable(false);
-                                        progressDialog.show();
-                                    }
-
-                                    @Override
-                                    public void onDownloadStart() {
-                                        progressDialog.dismiss();
-
-                                        downloadManager.download(new OnProgressUpdateCallback() {
-                                            @Override
-                                            public void setProgress(int progress) {
-                                                DownloadInfo downloadInfo = new DownloadInfo();
-                                                downloadInfo.progress = progress;
-                                                downloadInfo.fileName = downloadManager.getFileName();
-                                                downloadInfo.fileSize = downloadManager.getFileLength();
-                                                downloadInfo.downloadSpeed = netspeedDetector.
-                                                        getNetworkSpeed();
-                                                // need to deal with image file
-
-                                                if (!downItemNameList.contains(downloadInfo.fileName)) {
-                                                    downItemNameList.add(downloadInfo.fileName);
-                                                    downloadInfoList.add(downloadInfo);
-                                                } else {
-                                                    int position = downItemNameList.indexOf(downloadInfo.fileName);
-                                                    downloadInfoList.set(position, downloadInfo);
-                                                }
-
-                                                if (downloadItemRecyclerView.getAdapter() == null) {
-                                                    recyclerAdaper = new DownloadingItemAdapter(
-                                                            MainActivity.this, downloadInfoList
-                                                    );
-                                                    downloadItemRecyclerView.setAdapter(recyclerAdaper);
-                                                } else {
-                                                    recyclerAdaper.setDownloadInfoList(downloadInfoList);
-//                                                    recyclerAdaper.notifyDataSetChanged();
-                                                    recyclerAdaper.notifyItemInserted(downloaderList.size());
-                                                }
-                                            }
-                                        });
-                                    }
-
-                                    @Override
-                                    public void onDownloadError() {
-                                        progressDialog.setCancelable(true);
-                                        progressDialog.dismiss();
-                                    }
-                                });
+                                startDownload(editText);
                             }
                         });
 
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    private void startDownload(EditText editText) {
+        String link = editText.getText().toString();
+        File saveDir = Environment.getExternalStorageDirectory();
+
+        final MultiThreadManager downloadManager = new MultiThreadManager(threadNum, link, saveDir, MainActivity.this);
+        downloaderList.add(downloadManager);
+
+        downloadManager.fetchDownloadFileLength(new OnDownloadCallback() {
+            @Override
+            public void onPreDownload() {
+                progressDialog.setTitle("Download info");
+                progressDialog.setMessage("Start downloading");
+                progressDialog.setCancelable(false);
+                progressDialog.show();
+            }
+
+            @Override
+            public void onDownloadStart() {
+                progressDialog.dismiss();
+
+                downloadManager.download(new OnProgressUpdateCallback() {
+                    @Override
+                    public void setProgress(int progress) {
+                        int position = 0;
+
+                        DownloadInfo downloadInfo = new DownloadInfo();
+                        downloadInfo.progress = progress;
+                        downloadInfo.fileName = downloadManager.getFileName();
+                        downloadInfo.fileSize = downloadManager.getFileLength();
+                        downloadInfo.downloadSpeed = netspeedDetector.getNetworkSpeed();
+
+                        // if not finish downloading
+                        // then update the progress
+                        if (progress < 100) {
+                            downloadInfo.downloadState = DownloadInfo.DOWNLOAD_ONGOING;
+                            // need to deal with image file
+                            if (!downItemNameList.contains(downloadInfo.fileName)) {
+                                downItemNameList.add(downloadInfo.fileName);
+                                downloadInfoList.add(downloadInfo);
+                            } else {
+                                position = downItemNameList.indexOf(downloadInfo.fileName);
+                                downloadInfoList.set(position, downloadInfo);
+                            }
+
+                            if (downloadItemRecyclerView.getAdapter() == null) {
+                                recyclerAdaper = new DownloadingItemAdapter(
+                                        MainActivity.this, downloadInfoList
+                                );
+                                downloadItemRecyclerView.setAdapter(recyclerAdaper);
+                            } else {
+                                recyclerAdaper.setDownloadInfoList(downloadInfoList);
+                                recyclerAdaper.notifyItemChanged(position);
+                            }
+                        } else {
+                            downloadInfo.downloadState = DownloadInfo.DOWNLOAD_FINISH;
+                            position = downItemNameList.indexOf(downloadInfo.fileName);
+                            downloadInfoList.set(position, downloadInfo);
+
+                            recyclerAdaper.setDownloadInfoList(downloadInfoList);
+                            recyclerAdaper.notifyItemChanged(position);
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onDownloadError() {
+                progressDialog.setCancelable(true);
+                progressDialog.dismiss();
+            }
+        });
     }
 
     private void setFragmentItem(int position) {
@@ -242,7 +258,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     protected void onDestroy() {
         super.onDestroy();
 
-        for (MultiThreadManager downloader:downloaderList){
+        for (MultiThreadManager downloader : downloaderList) {
             downloader.setIsExist(false);
             downloader.shutdownNow();
         }
