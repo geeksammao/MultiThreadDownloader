@@ -256,7 +256,10 @@ public class MultiThreadManager {
 
     // need to fix suffix
     private String setFileName() {
-        String fileName = targetUrl.substring(targetUrl.lastIndexOf("/") + 1);
+        String fileName = null;
+
+        if ()
+         fileName = targetUrl.substring(targetUrl.lastIndexOf("/") + 1);
         if (fileName.trim().equals("")) {
             fileName = String.valueOf(UUID.randomUUID());
         }
