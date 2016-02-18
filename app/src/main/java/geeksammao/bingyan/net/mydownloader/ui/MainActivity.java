@@ -48,7 +48,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private CoordinatorLayout container;
     private ProgressDialog progressDialog;
     private RecyclerView downloadItemRecyclerView;
-    private DownloadingItemAdapter recyclerAdaper;
+    private DownloadingItemAdapter recyclerAdapter;
 
     @Override
     protected void setContentView() {
@@ -67,7 +67,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         // init the downloadInfoList if previous download exists
         downloadInfoList = new ArrayList<>();
         downItemNameList = new ArrayList<>();
-        recyclerAdaper = new DownloadingItemAdapter(
+        recyclerAdapter = new DownloadingItemAdapter(
                 MainActivity.this, downloadInfoList
         );
     }
@@ -87,7 +87,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         container = (CoordinatorLayout) findViewById(R.id.content);
         downloadItemRecyclerView = (RecyclerView) findViewById(R.id.down_item_rv);
         downloadItemRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        downloadItemRecyclerView.setAdapter(recyclerAdaper);
+        downloadItemRecyclerView.setAdapter(recyclerAdapter);
 //        downloadItemRecyclerView.setAdapter();
 
         // init drawer
@@ -131,7 +131,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     private void startDownload(final EditText editText) {
         String link = editText.getText().toString();
-        File saveDir = Environment.getExternalStorageDirectory();
+        File saveDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
 
         final MultiThreadManager downloadManager = new MultiThreadManager(threadNum, link, saveDir, MainActivity.this);
         downloaderList.add(downloadManager);
@@ -175,21 +175,21 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                             }
 
                             if (downloadItemRecyclerView.getAdapter() == null) {
-                                recyclerAdaper = new DownloadingItemAdapter(
+                                recyclerAdapter = new DownloadingItemAdapter(
                                         MainActivity.this, downloadInfoList
                                 );
-                                downloadItemRecyclerView.setAdapter(recyclerAdaper);
+                                downloadItemRecyclerView.setAdapter(recyclerAdapter);
                             } else {
-                                recyclerAdaper.setDownloadInfoList(downloadInfoList);
-                                recyclerAdaper.notifyItemChanged(position);
+                                recyclerAdapter.setDownloadInfoList(downloadInfoList);
+                                recyclerAdapter.notifyItemChanged(position);
                             }
                         } else {
                             downloadInfo.downloadState = DownloadInfo.DOWNLOAD_FINISH;
                             position = downItemNameList.indexOf(downloadInfo.fileName);
                             downloadInfoList.set(position, downloadInfo);
 
-                            recyclerAdaper.setDownloadInfoList(downloadInfoList);
-                            recyclerAdaper.notifyItemChanged(position);
+                            recyclerAdapter.setDownloadInfoList(downloadInfoList);
+                            recyclerAdapter.notifyItemChanged(position);
                         }
                     }
                 });

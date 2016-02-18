@@ -79,7 +79,6 @@ public class DownloadTask extends BaseTask {
     }
 
     private void writeStreamToFile(InputStream inputStream) throws IOException {
-
         byte[] buffer = new byte[50 * 1024];
         int length;
         RandomAccessFile randomAccessFile;

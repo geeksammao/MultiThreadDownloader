@@ -3,6 +3,7 @@ package geeksammao.bingyan.net.mydownloader.network;
 import android.accounts.NetworkErrorException;
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 
 import java.io.File;
 import java.io.RandomAccessFile;
@@ -26,7 +27,7 @@ public class MultiThreadManager {
     private ExecutorService taskExecutorService = Executors.newFixedThreadPool(CORE_NUM + 1);
 
     private int threadNum;
-    private  String targetUrl;
+    private String targetUrl;
     private boolean isExist;
     private long fileLength;
     private int downloadedLength;
@@ -43,8 +44,7 @@ public class MultiThreadManager {
     public MultiThreadManager(int threadNum, String targetUrl, File saveDir, Context context) {
         this.threadNum = threadNum;
         this.targetUrl = targetUrl;
-        this.fileName = setFileName();
-        this.saveDir = new File(saveDir, this.fileName);
+        this.saveDir = saveDir;
         databaseManager = DatabaseManager.getInstance(context);
 
         this.activity = (Activity) context;
@@ -119,6 +119,9 @@ public class MultiThreadManager {
             @Override
             public void run() {
                 block = (fileLength % threadNum == 0) ? (fileLength / threadNum) : (fileLength / threadNum + 1);
+                fileName = fetchFileName();
+                saveDir = new File(saveDir, fileName);
+                Log.e("sam",saveDir.toString());
                 initRandomAccessFile();
 
                 if (threadNum != downloadedLengthMap.size()) {
@@ -197,6 +200,7 @@ public class MultiThreadManager {
     private void startDownloadThread(int i) {
         downloadTasks[i] = new DownloadTask(MultiThreadManager.this, targetUrl,
                 saveDir, block, downloadedLengthMap.get(i + 1), i + 1, 0);
+        Log.e("sam",saveDir.toString());
         downloadTasks[i].setPriority(Thread.MAX_PRIORITY);
         taskExecutorService.execute(downloadTasks[i]);
     }
@@ -255,11 +259,14 @@ public class MultiThreadManager {
     }
 
     // need to fix suffix
-    private String setFileName() {
-        String fileName = null;
+    private String fetchFileName() {
+        String fileName;
+        HttpUtil httpUtil = HttpUtil.getInstance();
+        if ((fileName = httpUtil.getFileName(targetUrl)) != null) {
+            return fileName;
+        }
 
-        if ()
-         fileName = targetUrl.substring(targetUrl.lastIndexOf("/") + 1);
+        fileName = targetUrl.substring(targetUrl.lastIndexOf("/") + 1);
         if (fileName.trim().equals("")) {
             fileName = String.valueOf(UUID.randomUUID());
         }

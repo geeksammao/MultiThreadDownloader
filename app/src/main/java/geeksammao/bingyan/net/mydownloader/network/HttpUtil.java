@@ -256,6 +256,43 @@ public class HttpUtil {
         return requestResult;
     }
 
+    public String getFileName(String url) {
+        String filename = "";
+        URL myURL;
+        HttpURLConnection conn = null;
+        if (url == null || url.length() < 1) {
+            return null;
+        }
+
+        try {
+            myURL = new URL(url);
+            conn = (HttpURLConnection) myURL.openConnection();
+            setUrlConnectionWithHeadMethod(conn);
+            conn.connect();
+
+            if (conn.getResponseCode() != HTTP_OK) {
+                return null;
+            } else {
+                URL absUrl = conn.getURL();
+                filename = conn.getHeaderField("Content-Disposition");
+                if (filename == null || filename.length() < 1) {
+                    filename = absUrl.getFile();
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+
+        if (filename.contains("/")){
+            filename = filename.substring(filename.lastIndexOf("/") + 1,filename.length());
+        }
+        return filename;
+    }
+
     private String inputStreamToString(InputStream inputStream) throws IOException {
         BufferedReader br = null;
         try {
