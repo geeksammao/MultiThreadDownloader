@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="kotlin-runtime-1.0.0-beta-4584">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-runtime/1.0.0-beta-4584/1dfc3d47ade4c45dc6db8ee6f5bf65771fab3dce/kotlin-runtime-1.0.0-beta-4584.jar!/" />
+      <root url="jar://$APPLICATION_HOME_DIR$/gradle/m2repository/org/jetbrains/kotlin/kotlin-runtime/1.0.0-beta-4584/kotlin-runtime-1.0.0-beta-4584.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

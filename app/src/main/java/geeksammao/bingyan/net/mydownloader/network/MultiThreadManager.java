@@ -3,7 +3,6 @@ package geeksammao.bingyan.net.mydownloader.network;
 import android.accounts.NetworkErrorException;
 import android.app.Activity;
 import android.content.Context;
-import android.util.Log;
 
 import java.io.File;
 import java.io.RandomAccessFile;
@@ -65,6 +64,7 @@ public class MultiThreadManager {
 
                     if (requestResult.getStatus() == 200) {
                         length = requestResult.getData();
+                        fileName = fetchFileName();
 
                         if (length <= 0) {
                             throw new NetworkErrorException("File size error");
@@ -86,9 +86,12 @@ public class MultiThreadManager {
                                 downloadedLength += downloadedLengthMap.get(i + 1);
                             }
                         }
+
+                        saveDir = new File(saveDir, fileName);
+                        initRandomAccessFile();
                     } else {
                         retryNum++;
-                        if (retryNum < 3) {
+                        if (retryNum < 2) {
                             activity.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -119,10 +122,6 @@ public class MultiThreadManager {
             @Override
             public void run() {
                 block = (fileLength % threadNum == 0) ? (fileLength / threadNum) : (fileLength / threadNum + 1);
-                fileName = fetchFileName();
-                saveDir = new File(saveDir, fileName);
-                Log.e("sam",saveDir.toString());
-                initRandomAccessFile();
 
                 if (threadNum != downloadedLengthMap.size()) {
                     downloadedLengthMap.clear();
@@ -200,7 +199,6 @@ public class MultiThreadManager {
     private void startDownloadThread(int i) {
         downloadTasks[i] = new DownloadTask(MultiThreadManager.this, targetUrl,
                 saveDir, block, downloadedLengthMap.get(i + 1), i + 1, 0);
-        Log.e("sam",saveDir.toString());
         downloadTasks[i].setPriority(Thread.MAX_PRIORITY);
         taskExecutorService.execute(downloadTasks[i]);
     }

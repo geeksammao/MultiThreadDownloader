@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="antlr4-4.5">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.tunnelvisionlabs/antlr4/4.5/a0e860e317147848e69ac145bc5196901a9993bf/antlr4-4.5.jar!/" />
+      <root url="jar://$APPLICATION_HOME_DIR$/gradle/m2repository/com/tunnelvisionlabs/antlr4/4.5/antlr4-4.5.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
