@@ -2,14 +2,14 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
-                android:layout_height="88dp">
+                android:layout_height="96dp">
 
     <ImageView
         android:id="@+id/down_item_imv"
         android:layout_width="@dimen/download_item_image"
         android:layout_height="@dimen/download_item_image"
         android:layout_centerVertical="true"
-        android:src="@drawable/ic_downloading"/>
+        tools:src="@drawable/ic_downloading"/>
 
     <ProgressBar
         android:id="@+id/down_item_prgb"
@@ -78,11 +78,11 @@
         android:layout_height="wrap_content"
         android:layout_above="@id/down_item_prgb"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="14dp"
         android:ellipsize="end"
         android:gravity="center"
         android:singleLine="true"
-        android:textSize="18sp"
+        android:textSize="16sp"
         tools:text="xxx.apk"
         />
 </RelativeLayout>

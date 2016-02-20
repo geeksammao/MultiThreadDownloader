@@ -40,14 +40,14 @@
                 android:id="@+id/down_item_rv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"/>
+                />
 
         </FrameLayout>
 
         <!--<android.support.v7.widget.RecyclerView-->
-            <!--android:id="@+id/down_item_v"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"/>-->
+        <!--android:id="@+id/down_item_v"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"/>-->
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"

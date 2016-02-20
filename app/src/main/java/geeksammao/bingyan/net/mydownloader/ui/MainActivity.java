@@ -149,18 +149,22 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             public void onDownloadStart() {
                 progressDialog.dismiss();
 
+//                final DownloadInfo downloadInfo = new DownloadInfo();
+//                downloadInfo.url = editText.getText().toString();
+
                 downloadManager.download(new OnProgressUpdateCallback() {
                     @Override
                     public void setProgress(int progress) {
                         int position = 0;
 
                         DownloadInfo downloadInfo = new DownloadInfo();
-                        downloadInfo.progress = progress;
                         downloadInfo.url = editText.getText().toString();
+                        downloadInfo.progress = progress;
+                        downloadInfo.downloadSpeed = netspeedDetector.getNetworkSpeed();
+//                        if (downloadItemRecyclerView.getAdapter() == null) {
                         downloadInfo.fileName = downloadManager.getFileName();
                         downloadInfo.fileSize = downloadManager.getFileLength();
-                        downloadInfo.downloadSpeed = netspeedDetector.getNetworkSpeed();
-
+//                        }
                         // if not finish downloading
                         // then update the progress
                         if (progress < 100) {

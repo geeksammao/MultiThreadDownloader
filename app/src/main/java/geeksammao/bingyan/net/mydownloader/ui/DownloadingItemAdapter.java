@@ -20,6 +20,7 @@ import geeksammao.bingyan.net.mydownloader.model.DownloadInfo;
 public class DownloadingItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private MainActivity activity;
     private List<DownloadInfo> downloadInfoList;
+    private int num;
 
     public DownloadingItemAdapter(MainActivity activity, List<DownloadInfo> downloadInfoList) {
         this.activity = activity;
@@ -46,6 +47,7 @@ public class DownloadingItemAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        num++;
         int progress = downloadInfoList.get(position).progress;
         long downloadSpeed = downloadInfoList.get(position).downloadSpeed;
         double fileSize = downloadInfoList.get(position).fileSize;
@@ -58,16 +60,18 @@ public class DownloadingItemAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                 DownloadingItemViewHolder downloadingItemViewHolder = (DownloadingItemViewHolder) holder;
 
                 downloadingItemViewHolder.setProgress(progress);
-                downloadingItemViewHolder.setFileSize(fileSize);
-                downloadingItemViewHolder.setFileName(fileName);
                 downloadingItemViewHolder.setDownloadSpeed(downloadSpeed);
                 downloadingItemViewHolder.setDownloadProgressTv(progress);
-                if (fileImage != null) {
-                    downloadingItemViewHolder.setFileImageView(fileImage);
-                } else {
-                    // set the image according to the file suffix
-                    downloadingItemViewHolder.setFileImageView(fileName);
-                }
+//                if (num == 1){
+                    downloadingItemViewHolder.setFileSize(fileSize);
+                    downloadingItemViewHolder.setFileName(fileName);
+                    if (fileImage != null) {
+                        downloadingItemViewHolder.setFileImageView(fileImage);
+                    } else {
+                        // set the image according to the file suffix
+                        downloadingItemViewHolder.setFileImageView(fileName);
+                    }
+//                }
                 break;
 
             case DownloadInfo.DOWNLOAD_FINISH:

@@ -1,5 +1,7 @@
 package geeksammao.bingyan.net.mydownloader.network;
 
+import android.os.Bundle;
+
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -291,6 +293,56 @@ public class HttpUtil {
             filename = filename.substring(filename.lastIndexOf("/") + 1,filename.length());
         }
         return filename;
+    }
+
+    public RequestResult<Bundle> getFileLengthAndName(String targetUrl){
+        HttpURLConnection urlConnection = null;
+        RequestResult<Bundle> requestResult = new RequestResult<>();
+
+        try {
+            Bundle bundle = new Bundle();
+            URL url = new URL(targetUrl);
+            urlConnection = (HttpURLConnection) url.openConnection();
+            setUrlConnectionWithHeadMethod(urlConnection);
+            urlConnection.connect();
+
+            switch (urlConnection.getResponseCode()) {
+                case HttpURLConnection.HTTP_OK:
+                    requestResult.setStatus(HTTP_OK);
+                    String fileName = urlConnection.getHeaderField("Content-Disposition");
+                    if (fileName == null){
+                        fileName = urlConnection.getURL().getFile();
+                    }
+                    if (fileName.contains("/")){
+                        fileName = fileName.substring(fileName.lastIndexOf("/") + 1,fileName.length());
+                    }
+                    bundle.putString("name",fileName);
+                    bundle.putInt("length",urlConnection.getContentLength());
+                    requestResult.setMultiData(bundle);
+                    break;
+                case HttpURLConnection.HTTP_CLIENT_TIMEOUT:
+                    requestResult.setStatus(HTTP_ERROR);
+                    requestResult.setData(null);
+                    break;
+                case HttpURLConnection.HTTP_GATEWAY_TIMEOUT:
+                    requestResult.setStatus(HTTP_ERROR);
+                    requestResult.setData(null);
+                    break;
+                default:
+                    requestResult.setStatus(urlConnection.getResponseCode());
+                    requestResult.setData(null);
+                    break;
+            }
+        } catch (Exception e) {
+            requestResult.setStatus(HTTP_ERROR);
+            requestResult.setData(null);
+        } finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+        }
+
+        return requestResult;
     }
 
     private String inputStreamToString(InputStream inputStream) throws IOException {

@@ -53,8 +53,43 @@ public class DownloadingItemViewHolder extends RecyclerView.ViewHolder {
         fileImageView.setImageBitmap(bitmap);
     }
 
-    public void setFileImageView(String fileName) {
-//        fileImageView.setImageDrawable(drawable);
+    public void setFileImageView(String name) {
+        String suffix = name.substring(name.lastIndexOf(".") + 1, name.length());
+        switch (suffix) {
+            case "apk":
+                fileImageView.setImageResource(R.drawable.ic_apk);
+                break;
+            case "jpg":
+                fileImageView.setImageResource(R.drawable.ic_image);
+                break;
+            case "png":
+                fileImageView.setImageResource(R.drawable.ic_image);
+                break;
+            case "gif":
+                fileImageView.setImageResource(R.drawable.ic_image);
+                break;
+            case "webp":
+                fileImageView.setImageResource(R.drawable.ic_image);
+                break;
+            case "txt":
+                fileImageView.setImageResource(R.drawable.ic_document);
+                break;
+            case "mp4":
+                fileImageView.setImageResource(R.drawable.ic_movie);
+                break;
+            case "avi":
+                fileImageView.setImageResource(R.drawable.ic_movie);
+                break;
+            case "rmvb":
+                fileImageView.setImageResource(R.drawable.ic_movie);
+                break;
+            case "mkv":
+                fileImageView.setImageResource(R.drawable.ic_movie);
+                break;
+            default:
+                fileImageView.setImageResource(R.drawable.ic_file);
+                break;
+        }
     }
 
     public void setProgress(int progress) {

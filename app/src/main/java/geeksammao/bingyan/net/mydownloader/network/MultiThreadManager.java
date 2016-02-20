@@ -3,6 +3,7 @@ package geeksammao.bingyan.net.mydownloader.network;
 import android.accounts.NetworkErrorException;
 import android.app.Activity;
 import android.content.Context;
+import android.os.Bundle;
 
 import java.io.File;
 import java.io.RandomAccessFile;
@@ -60,11 +61,12 @@ public class MultiThreadManager {
 
                 try {
                     HttpUtil httpUtil = HttpUtil.getInstance();
-                    RequestResult<Integer> requestResult = httpUtil.getContentLength(targetUrl);
+                    RequestResult<Bundle> requestResult = httpUtil.getFileLengthAndName(targetUrl);
 
                     if (requestResult.getStatus() == 200) {
-                        length = requestResult.getData();
-                        fileName = fetchFileName();
+                        Bundle bundle = requestResult.getMultiData();
+                        length = bundle.getInt("length");
+                        fileName = bundle.getString("name");
 
                         if (length <= 0) {
                             throw new NetworkErrorException("File size error");
@@ -144,7 +146,7 @@ public class MultiThreadManager {
                 boolean isFinished = false;
                 while (!isFinished) {
                     try {
-                        Thread.sleep(600);
+                        Thread.sleep(700);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
