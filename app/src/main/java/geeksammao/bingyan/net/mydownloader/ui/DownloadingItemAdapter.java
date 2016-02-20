@@ -20,7 +20,6 @@ import geeksammao.bingyan.net.mydownloader.model.DownloadInfo;
 public class DownloadingItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private MainActivity activity;
     private List<DownloadInfo> downloadInfoList;
-    private int num;
 
     public DownloadingItemAdapter(MainActivity activity, List<DownloadInfo> downloadInfoList) {
         this.activity = activity;
@@ -40,6 +39,10 @@ public class DownloadingItemAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                 View downloadedRootView = LayoutInflater.from(activity).inflate(R.layout.downloaded_item_layout, parent, false);
                 viewHolder = new DownloadedItemViewHolder(downloadedRootView);
                 break;
+            case DownloadInfo.DOWNLOAD_FAIL:
+                View downloadFailRootView = LayoutInflater.from(activity).inflate(R.layout.downloaded_item_layout, parent, false);
+                viewHolder = new DownloadedItemViewHolder(downloadFailRootView);
+                break;
         }
 
         return viewHolder;
@@ -47,7 +50,6 @@ public class DownloadingItemAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        num++;
         int progress = downloadInfoList.get(position).progress;
         long downloadSpeed = downloadInfoList.get(position).downloadSpeed;
         double fileSize = downloadInfoList.get(position).fileSize;
@@ -62,16 +64,13 @@ public class DownloadingItemAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                 downloadingItemViewHolder.setProgress(progress);
                 downloadingItemViewHolder.setDownloadSpeed(downloadSpeed);
                 downloadingItemViewHolder.setDownloadProgressTv(progress);
-//                if (num == 1){
-                    downloadingItemViewHolder.setFileSize(fileSize);
-                    downloadingItemViewHolder.setFileName(fileName);
-                    if (fileImage != null) {
-                        downloadingItemViewHolder.setFileImageView(fileImage);
-                    } else {
-                        // set the image according to the file suffix
-                        downloadingItemViewHolder.setFileImageView(fileName);
-                    }
-//                }
+                downloadingItemViewHolder.setFileSize(fileSize);
+                downloadingItemViewHolder.setFileName(fileName);
+                if (fileImage != null) {
+                    downloadingItemViewHolder.setFileImageView(fileImage);
+                } else {
+                    downloadingItemViewHolder.setFileImageView(fileName);
+                }
                 break;
 
             case DownloadInfo.DOWNLOAD_FINISH:

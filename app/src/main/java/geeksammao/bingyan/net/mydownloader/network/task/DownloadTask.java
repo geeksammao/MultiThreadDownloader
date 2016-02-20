@@ -25,6 +25,7 @@ public class DownloadTask extends BaseTask {
     private int threadID;
     private int startTimes;
     private boolean isFinished;
+    private boolean isTaskFailed;
 
     public DownloadTask(MultiThreadManager threadManager, String targetUrl, File saveDir, long block, long downloadedLength
             , int threadID, int startTimes) {
@@ -42,7 +43,7 @@ public class DownloadTask extends BaseTask {
     void startTask() {
         startTimes++;
 
-        if (startTimes <= 3) {
+        if (startTimes <= 2) {
             Logger.logString(this, "Thread " + Integer.toString(threadID) + " is start");
             HttpUtil httpUtil = HttpUtil.getInstance();
             long endPosition = block * threadID - 1;
@@ -55,9 +56,11 @@ public class DownloadTask extends BaseTask {
                     InputStream inputStream = result.getData();
                     try {
                         writeStreamToFile(inputStream);
-                    } catch (IOException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
-                        new DownloadTask(threadManager, targetUrl, saveDir, block, downloadedLength, threadID, startTimes).start();
+                        isTaskFailed = true;
+                        return;
+//                        new DownloadTask(threadManager, targetUrl, saveDir, block, downloadedLength, threadID, startTimes).start();
                     } finally {
                         try {
                             inputStream.close();
@@ -67,15 +70,18 @@ public class DownloadTask extends BaseTask {
                     }
 
                     isFinished = true;
-                    Logger.logString(this, "Thread " + Integer.toString(threadID) + " is finished");
+                    Logger.logString(this, "Thread " + Integer.toString(threadID) + "'s task is finished");
                 } else {
-                    new DownloadTask(threadManager, targetUrl, saveDir, block, downloadedLength, threadID, startTimes).start();
+                    isTaskFailed = true;
+//                    new DownloadTask(threadManager, targetUrl, saveDir, block, downloadedLength, threadID, startTimes).start();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                new DownloadTask(threadManager, targetUrl, saveDir, block, downloadedLength, threadID, startTimes).start();
+                isTaskFailed = true;
+//                new DownloadTask(threadManager, targetUrl, saveDir, block, downloadedLength, threadID, startTimes).start();
             }
         }
+        Logger.logString(this, "Thread " + Integer.toString(threadID) + " ended with the retry num of " + String.valueOf(startTimes - 1));
     }
 
     private void writeStreamToFile(InputStream inputStream) throws IOException {
@@ -104,6 +110,15 @@ public class DownloadTask extends BaseTask {
 
     public long getDownloadedLength() {
         return downloadedLength;
+    }
+
+    public boolean isTaskFailed(){
+//        if (startTimes > 2){
+//            return true;
+//        } else {
+//            return false;
+//        }
+        return isTaskFailed;
     }
 
     public boolean isFinished() {

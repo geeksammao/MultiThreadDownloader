@@ -4,6 +4,7 @@ import android.accounts.NetworkErrorException;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 
 import java.io.File;
 import java.io.RandomAccessFile;
@@ -51,6 +52,10 @@ public class MultiThreadManager {
         downloadTasks = new DownloadTask[threadNum];
     }
 
+    public void setTargetUrl(String targetUrl){
+        this.targetUrl = targetUrl;
+    }
+
     public void fetchDownloadFileLength(final OnDownloadCallback callback) {
         callback.onPreDownload();
 
@@ -62,6 +67,7 @@ public class MultiThreadManager {
                 try {
                     HttpUtil httpUtil = HttpUtil.getInstance();
                     RequestResult<Bundle> requestResult = httpUtil.getFileLengthAndName(targetUrl);
+                    Log.e("sam",targetUrl);
 
                     if (requestResult.getStatus() == 200) {
                         Bundle bundle = requestResult.getMultiData();
@@ -146,7 +152,7 @@ public class MultiThreadManager {
                 boolean isFinished = false;
                 while (!isFinished) {
                     try {
-                        Thread.sleep(700);
+                        Thread.sleep(500);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -155,8 +161,20 @@ public class MultiThreadManager {
                         if (downloadTasks[i] != null &&
                                 !downloadTasks[i].isFinished()) {
                             isFinished = false;
+
                             if (downloadTasks[i].getDownloadedLength() == -1) {
                                 startDownloadThread(i);
+                            }
+
+                            if (downloadTasks[i].isTaskFailed() && callback != null) {
+                                Log.e("sam", "task fail");
+                                activity.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        callback.onFail(targetUrl);
+                                    }
+                                });
+                                return;
                             }
                         }
                     }
@@ -176,7 +194,7 @@ public class MultiThreadManager {
                     }
                 }
 
-                dbExecutorService.shutdown();
+//                dbExecutorService.shutdown();
                 if (downloadedLength >= fileLength) {
                     databaseManager.delete(targetUrl);
                 }

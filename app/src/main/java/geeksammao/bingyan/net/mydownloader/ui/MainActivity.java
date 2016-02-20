@@ -23,6 +23,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private CharSequence[] titles;
     private int threadNum;
     private List<DownloadInfo> downloadInfoList;
-    private List<String> downItemNameList;
+    private List<String> downItemUrlList;
     private List<MultiThreadManager> downloaderList = new ArrayList<>();
 
     private NetspeedDetector netspeedDetector = new NetspeedDetector(this);
@@ -50,6 +51,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private ProgressDialog progressDialog;
     private RecyclerView downloadItemRecyclerView;
     private DownloadingItemAdapter recyclerAdapter;
+    private MultiThreadManager downloadManager;
 
     @Override
     protected void setContentView() {
@@ -67,7 +69,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         threadNum = 3;
         // init the downloadInfoList if previous download exists
         downloadInfoList = new ArrayList<>();
-        downItemNameList = new ArrayList<>();
+        downItemUrlList = new ArrayList<>();
         recyclerAdapter = new DownloadingItemAdapter(
                 MainActivity.this, downloadInfoList
         );
@@ -93,7 +95,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             ((SimpleItemAnimator) itemAnimator).setSupportsChangeAnimations(false);
         }
         downloadItemRecyclerView.setAdapter(recyclerAdapter);
-//        downloadItemRecyclerView.setAdapter();
 
         // init drawer
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -138,8 +139,14 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         String link = editText.getText().toString();
         File saveDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
 
-        final MultiThreadManager downloadManager = new MultiThreadManager(threadNum, link, saveDir, MainActivity.this);
-        downloaderList.add(downloadManager);
+//        final MultiThreadManager downloadManager = new MultiThreadManager(threadNum, link, saveDir, MainActivity.this);
+        if (downloadManager == null){
+            downloadManager = new MultiThreadManager(threadNum, link, saveDir, MainActivity.this);
+        } else {
+            downloadManager.setTargetUrl(link);
+        }
+
+//        downloaderList.add(downloadManager);
 
         downloadManager.fetchDownloadFileLength(new OnDownloadCallback() {
             @Override
@@ -161,25 +168,23 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                     @Override
                     public void setProgress(int progress) {
                         int position = 0;
-
                         DownloadInfo downloadInfo = new DownloadInfo();
                         downloadInfo.url = editText.getText().toString();
                         downloadInfo.progress = progress;
                         downloadInfo.downloadSpeed = netspeedDetector.getNetworkSpeed();
-//                        if (downloadItemRecyclerView.getAdapter() == null) {
                         downloadInfo.fileName = downloadManager.getFileName();
                         downloadInfo.fileSize = downloadManager.getFileLength();
-//                        }
+
                         // if not finish downloading
                         // then update the progress
                         if (progress < 100) {
                             downloadInfo.downloadState = DownloadInfo.DOWNLOAD_ONGOING;
                             // need to deal with image file
-                            if (!downItemNameList.contains(downloadInfo.fileName)) {
-                                downItemNameList.add(downloadInfo.fileName);
+                            if (!downItemUrlList.contains(downloadInfo.url)) {
+                                downItemUrlList.add(downloadInfo.url);
                                 downloadInfoList.add(downloadInfo);
                             } else {
-                                position = downItemNameList.indexOf(downloadInfo.fileName);
+                                position = downItemUrlList.indexOf(downloadInfo.url);
                                 downloadInfoList.set(position, downloadInfo);
                             }
 
@@ -194,12 +199,30 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                             }
                         } else {
                             downloadInfo.downloadState = DownloadInfo.DOWNLOAD_FINISH;
-                            position = downItemNameList.indexOf(downloadInfo.fileName);
+                            position = downItemUrlList.indexOf(downloadInfo.url);
                             downloadInfoList.set(position, downloadInfo);
 
                             recyclerAdapter.setDownloadInfoList(downloadInfoList);
                             recyclerAdapter.notifyItemChanged(position);
                         }
+                    }
+
+                    @Override
+                    public void onFail(String url) {
+//                        downloaderList.get()
+                        int position = downItemUrlList.indexOf(url);
+
+                        DownloadInfo downloadInfo = new DownloadInfo();
+                        downloadInfo.url = url;
+                        downloadInfo.fileName = downloadManager.getFileName();
+                        downloadInfo.fileSize = downloadManager.getFileLength();
+                        downloadInfo.downloadState = DownloadInfo.DOWNLOAD_FAIL;
+
+                        downloadInfoList.set(position,downloadInfo);
+                        recyclerAdapter.setDownloadInfoList(downloadInfoList);
+                        recyclerAdapter.notifyItemChanged(position);
+
+                        Toast.makeText(MainActivity.this,url + " download failed",Toast.LENGTH_LONG).show();
                     }
                 });
             }
