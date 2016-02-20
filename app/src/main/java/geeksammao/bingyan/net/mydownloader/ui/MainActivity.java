@@ -15,6 +15,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -87,6 +88,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         container = (CoordinatorLayout) findViewById(R.id.content);
         downloadItemRecyclerView = (RecyclerView) findViewById(R.id.down_item_rv);
         downloadItemRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        RecyclerView.ItemAnimator itemAnimator = downloadItemRecyclerView.getItemAnimator();
+        if (itemAnimator instanceof SimpleItemAnimator) {
+            ((SimpleItemAnimator) itemAnimator).setSupportsChangeAnimations(false);
+        }
         downloadItemRecyclerView.setAdapter(recyclerAdapter);
 //        downloadItemRecyclerView.setAdapter();
 
