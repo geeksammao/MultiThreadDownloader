@@ -295,7 +295,7 @@ public class HttpUtil {
         return filename;
     }
 
-    public RequestResult<Bundle> getFileLengthAndName(String targetUrl){
+    public RequestResult<Bundle> getHeadFieldForDownload(String targetUrl){
         HttpURLConnection urlConnection = null;
         RequestResult<Bundle> requestResult = new RequestResult<>();
 
@@ -318,6 +318,8 @@ public class HttpUtil {
                     }
                     bundle.putString("name",fileName);
                     bundle.putInt("length",urlConnection.getContentLength());
+                    bundle.putString("accept_range",urlConnection.getHeaderField("Accept-Ranges"));
+                    bundle.putString("etag",urlConnection.getHeaderField("ETag"));
                     requestResult.setMultiData(bundle);
                     break;
                 case HttpURLConnection.HTTP_CLIENT_TIMEOUT:

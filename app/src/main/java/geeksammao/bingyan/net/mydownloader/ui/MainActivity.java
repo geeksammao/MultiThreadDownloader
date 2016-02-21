@@ -139,7 +139,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         String link = editText.getText().toString();
         File saveDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
 
-//        final MultiThreadManager downloadManager = new MultiThreadManager(threadNum, link, saveDir, MainActivity.this);
         if (downloadManager == null){
             downloadManager = new MultiThreadManager(threadNum, link, saveDir, MainActivity.this);
         } else {
@@ -148,7 +147,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
 //        downloaderList.add(downloadManager);
 
-        downloadManager.fetchDownloadFileLength(new OnDownloadCallback() {
+        downloadManager.initDownload(new OnDownloadCallback() {
             @Override
             public void onPreDownload() {
                 progressDialog.setTitle("Download info");

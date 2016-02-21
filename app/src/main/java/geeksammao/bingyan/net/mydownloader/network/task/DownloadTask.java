@@ -1,5 +1,7 @@
 package geeksammao.bingyan.net.mydownloader.network.task;
 
+import android.util.Log;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -72,6 +74,7 @@ public class DownloadTask extends BaseTask {
                     isFinished = true;
                     Logger.logString(this, "Thread " + Integer.toString(threadID) + "'s task is finished");
                 } else {
+                    Log.e("sam","download error with error code " + result.getStatus());
                     isTaskFailed = true;
 //                    new DownloadTask(threadManager, targetUrl, saveDir, block, downloadedLength, threadID, startTimes).start();
                 }

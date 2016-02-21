@@ -6,7 +6,12 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +35,7 @@ public class MultiThreadManager {
     private int threadNum;
     private String targetUrl;
     private boolean isExist;
+    private boolean isMultiThreadEnabled;
     private long fileLength;
     private int downloadedLength;
     private long block;
@@ -52,11 +58,11 @@ public class MultiThreadManager {
         downloadTasks = new DownloadTask[threadNum];
     }
 
-    public void setTargetUrl(String targetUrl){
+    public void setTargetUrl(String targetUrl) {
         this.targetUrl = targetUrl;
     }
 
-    public void fetchDownloadFileLength(final OnDownloadCallback callback) {
+    public void initDownload(final OnDownloadCallback callback) {
         callback.onPreDownload();
 
         new Thread(new Runnable() {
@@ -66,18 +72,27 @@ public class MultiThreadManager {
 
                 try {
                     HttpUtil httpUtil = HttpUtil.getInstance();
-                    RequestResult<Bundle> requestResult = httpUtil.getFileLengthAndName(targetUrl);
-                    Log.e("sam",targetUrl);
+                    RequestResult<Bundle> requestResult = httpUtil.getHeadFieldForDownload(targetUrl);
 
                     if (requestResult.getStatus() == 200) {
                         Bundle bundle = requestResult.getMultiData();
+                        boolean rangeAccept = ("bytes").equals(bundle.getString("accept_range"));
                         length = bundle.getInt("length");
                         fileName = bundle.getString("name");
+                        String etag = bundle.getString("etag");
+                        saveDir = new File(saveDir, fileName);
 
                         if (length <= 0) {
+                            activity.runOnUiThread(
+                                    new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            callback.onDownloadError();
+                                        }
+                                    }
+                            );
                             throw new NetworkErrorException("File size error");
                         }
-
                         setFileLength(length);
 
                         activity.runOnUiThread(new Runnable() {
@@ -87,35 +102,22 @@ public class MultiThreadManager {
                             }
                         });
 
-                        downloadedLengthMap = databaseManager.getDownloadedLengthWithMap(targetUrl);
-
-                        if (downloadedLengthMap.size() == threadNum) {
-                            for (int i = 0; i < threadNum; i++) {
-                                downloadedLength += downloadedLengthMap.get(i + 1);
-                            }
-                        }
-
-                        saveDir = new File(saveDir, fileName);
-                        initRandomAccessFile();
-                    } else {
-                        retryNum++;
-                        if (retryNum < 2) {
-                            activity.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    fetchDownloadFileLength(callback);
-                                }
-                            });
+                        if (rangeAccept) {
+                            isMultiThreadEnabled = false;
+//                            isMultiThreadEnabled = true;
+//                            initForMultiThreadDownload(length, callback);
                         } else {
-                            activity.runOnUiThread(
-                                    new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            callback.onDownloadError();
-                                        }
-                                    }
-                            );
+                            isMultiThreadEnabled = false;
                         }
+                    } else {
+                        activity.runOnUiThread(
+                                new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        callback.onDownloadError();
+                                    }
+                                }
+                        );
                         throw new NetworkErrorException("Network error with error code " + requestResult.getStatus());
                     }
                 } catch (Exception e) {
@@ -125,80 +127,147 @@ public class MultiThreadManager {
         }).start();
     }
 
+    private void downloadWithSingleThread(long totalFileLength,final OnProgressUpdateCallback callback) {
+        int totalDownloadLength = 0;
+        HttpUtil httpUtil = HttpUtil.getInstance();
+        RequestResult<InputStream> result = httpUtil.getInputStream(targetUrl);
+
+        if (result.getStatus() == 200) {
+            InputStream inputStream = result.getData();
+
+            byte[] buffer = new byte[50 * 1024];
+            int length;
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream, buffer.length);
+            FileOutputStream fileOutputStream = null;
+            try {
+                fileOutputStream = new FileOutputStream(saveDir);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                while ((length = bufferedInputStream.read(buffer, 0, buffer.length)) != -1) {
+                    totalDownloadLength += length;
+                    final int progress = totalDownloadLength/(int)totalFileLength;
+                    Thread.sleep(500);
+                    fileOutputStream.write(buffer);
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.setProgress(progress);
+                        }
+                    });
+                }
+                fileOutputStream.flush();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    fileOutputStream.close();
+                    bufferedInputStream.close();
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else {
+            try {
+                throw new NetworkErrorException("Network error with error code " + result.getStatus());
+            } catch (NetworkErrorException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void initForMultiThreadDownload(int length, final OnDownloadCallback callback) throws NetworkErrorException {
+        downloadedLengthMap = databaseManager.getDownloadedLengthWithMap(targetUrl);
+
+        if (downloadedLengthMap.size() == threadNum) {
+            for (int i = 0; i < threadNum; i++) {
+                downloadedLength += downloadedLengthMap.get(i + 1);
+            }
+        }
+
+        initRandomAccessFile();
+    }
+
     public void download(final OnProgressUpdateCallback callback) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                block = (fileLength % threadNum == 0) ? (fileLength / threadNum) : (fileLength / threadNum + 1);
+                if (isMultiThreadEnabled) {
+                    block = (fileLength % threadNum == 0) ? (fileLength / threadNum) : (fileLength / threadNum + 1);
 
-                if (threadNum != downloadedLengthMap.size()) {
-                    downloadedLengthMap.clear();
+                    if (threadNum != downloadedLengthMap.size()) {
+                        downloadedLengthMap.clear();
+                        for (int i = 0; i < threadNum; i++) {
+                            downloadedLengthMap.put(i + 1, 0l);
+                        }
+                        downloadedLength = 0;
+                    }
                     for (int i = 0; i < threadNum; i++) {
-                        downloadedLengthMap.put(i + 1, 0l);
-                    }
-                    downloadedLength = 0;
-                }
-                for (int i = 0; i < threadNum; i++) {
-                    if (downloadedLengthMap.get(i + 1) < block && downloadedLength < fileLength) {
-                        startDownloadThread(i);
-                    } else {
-                        downloadTasks[i] = null;
-                    }
-                }
-
-                databaseManager.delete(targetUrl);
-                databaseManager.setData(targetUrl, downloadedLengthMap);
-
-                boolean isFinished = false;
-                while (!isFinished) {
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    isFinished = true;
-                    for (int i = 0; i < threadNum; i++) {
-                        if (downloadTasks[i] != null &&
-                                !downloadTasks[i].isFinished()) {
-                            isFinished = false;
-
-                            if (downloadTasks[i].getDownloadedLength() == -1) {
-                                startDownloadThread(i);
-                            }
-
-                            if (downloadTasks[i].isTaskFailed() && callback != null) {
-                                Log.e("sam", "task fail");
-                                activity.runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        callback.onFail(targetUrl);
-                                    }
-                                });
-                                return;
-                            }
+                        if (downloadedLengthMap.get(i + 1) < block && downloadedLength < fileLength) {
+                            startDownloadThread(i);
+                        } else {
+                            downloadTasks[i] = null;
                         }
                     }
 
-                    // update the progress
-                    if (callback != null) {
-                        final int progress = (int) (100L * ((long) downloadedLength) / fileLength);
-                        if (downloadedLength >= fileLength) {
-                            isFinished = true;
-                        }
-                        activity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                callback.setProgress(progress);
-                            }
-                        });
-                    }
-                }
-
-//                dbExecutorService.shutdown();
-                if (downloadedLength >= fileLength) {
                     databaseManager.delete(targetUrl);
-                }
+                    databaseManager.setData(targetUrl, downloadedLengthMap);
 
+                    boolean isFinished = false;
+                    while (!isFinished) {
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        isFinished = true;
+                        for (int i = 0; i < threadNum; i++) {
+                            if (downloadTasks[i] != null &&
+                                    !downloadTasks[i].isFinished()) {
+                                isFinished = false;
+
+                                if (downloadTasks[i].getDownloadedLength() == -1) {
+                                    startDownloadThread(i);
+                                }
+
+                                if (downloadTasks[i].isTaskFailed() && callback != null) {
+                                    Log.e("sam", "task fail");
+                                    activity.runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            callback.onFail(targetUrl);
+                                        }
+                                    });
+                                    return;
+                                }
+                            }
+                        }
+
+                        // update the progress
+                        if (callback != null) {
+                            final int progress = (int) (100L * ((long) downloadedLength) / fileLength);
+                            if (downloadedLength >= fileLength) {
+                                isFinished = true;
+                            }
+                            activity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+//                                    callback.setProgress(progress);
+                                }
+                            });
+                        }
+                    }
+
+                    if (downloadedLength >= fileLength) {
+                        databaseManager.delete(targetUrl);
+                    }
+
+                } else {
+                    downloadWithSingleThread(fileLength,callback);
+                }
             }
         }).start();
     }
