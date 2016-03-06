@@ -77,6 +77,11 @@ public class DatabaseManager {
         sqLiteDatabase.close();
     }
 
+    public synchronized void setCacheControlInfo(String path,String etag,String lastModified){
+        SQLiteDatabase sqLiteDatabase = getDatabase();
+        sqLiteDatabase.execSQL("insert into fileloadertable ");
+    }
+
     public synchronized void update(String path, int threadID, int downloadedLength) {
         SQLiteDatabase sqLiteDatabase = getDatabase();
         sqLiteDatabase.execSQL("update fileloadertable set downedlen=? where " +

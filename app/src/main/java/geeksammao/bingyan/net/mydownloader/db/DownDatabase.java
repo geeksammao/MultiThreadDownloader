@@ -21,7 +21,11 @@ public class DownDatabase extends SQLiteOpenHelper {
                 "_id integer primary key AUTOINCREMENT," +
                 "threadId integer not null," +
                 "downpath text not null," +
-                "downedlen long not null)");
+                "downedlen long not null," +
+                "etag text," +
+                "last_modified text)"
+        )
+        ;
     }
 
     @Override

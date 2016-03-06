@@ -61,7 +61,7 @@ public class DownloadTask extends BaseTask {
                     } catch (Exception e) {
                         e.printStackTrace();
                         isTaskFailed = true;
-                        return;
+//                        return;
 //                        new DownloadTask(threadManager, targetUrl, saveDir, block, downloadedLength, threadID, startTimes).start();
                     } finally {
                         try {
@@ -74,17 +74,14 @@ public class DownloadTask extends BaseTask {
                     isFinished = true;
                     Logger.logString(this, "Thread " + Integer.toString(threadID) + "'s task is finished");
                 } else {
-                    Log.e("sam","download error with error code " + result.getStatus());
+                    Log.e("sam", "download error with error code " + result.getStatus());
                     isTaskFailed = true;
-//                    new DownloadTask(threadManager, targetUrl, saveDir, block, downloadedLength, threadID, startTimes).start();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 isTaskFailed = true;
-//                new DownloadTask(threadManager, targetUrl, saveDir, block, downloadedLength, threadID, startTimes).start();
             }
         }
-        Logger.logString(this, "Thread " + Integer.toString(threadID) + " ended with the retry num of " + String.valueOf(startTimes - 1));
     }
 
     private void writeStreamToFile(InputStream inputStream) throws IOException {
@@ -95,17 +92,15 @@ public class DownloadTask extends BaseTask {
         randomAccessFile = new RandomAccessFile(this.saveDir, "rwd");
         randomAccessFile.seek(this.startPosition);
 
-        BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream,50 * 1024);
+        BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream, 50 * 1024);
         while (!threadManager.isExist() &&
-                (length = bufferedInputStream.read(buffer, 0, buffer.length)) != -1) {
+                (length = inputStream.read(buffer, 0, buffer.length)) != -1) {
             randomAccessFile.write(buffer, 0, length);
             downloadedLength += length;
             threadManager.setDownloadedLength(threadID, downloadedLength);
             threadManager.appendDownloadedLength(length);
 
-            if (threadID == 0){
-                threadManager.updateDB();
-            }
+            threadManager.updateDB();
         }
         randomAccessFile.close();
         inputStream.close();
@@ -115,12 +110,7 @@ public class DownloadTask extends BaseTask {
         return downloadedLength;
     }
 
-    public boolean isTaskFailed(){
-//        if (startTimes > 2){
-//            return true;
-//        } else {
-//            return false;
-//        }
+    public boolean isTaskFailed() {
         return isTaskFailed;
     }
 

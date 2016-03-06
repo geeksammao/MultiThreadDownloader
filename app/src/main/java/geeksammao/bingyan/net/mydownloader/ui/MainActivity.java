@@ -77,6 +77,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     @Override
     protected void initView() {
+        Log.e("sam", "onCreate");
         // init toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -139,8 +140,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         String link = editText.getText().toString();
         File saveDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
 
-        if (downloadManager == null){
-            downloadManager = new MultiThreadManager(threadNum, link, saveDir, MainActivity.this);
+        if (downloadManager == null) {
+            downloadManager = new MultiThreadManager(threadNum, link, saveDir,this);
         } else {
             downloadManager.setTargetUrl(link);
         }
@@ -160,9 +161,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             public void onDownloadStart() {
                 progressDialog.dismiss();
 
-//                final DownloadInfo downloadInfo = new DownloadInfo();
-//                downloadInfo.url = editText.getText().toString();
-
                 downloadManager.download(new OnProgressUpdateCallback() {
                     @Override
                     public void setProgress(int progress) {
@@ -178,10 +176,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                         // then update the progress
                         if (progress < 100) {
                             downloadInfo.downloadState = DownloadInfo.DOWNLOAD_ONGOING;
-                            // need to deal with image file
+
                             if (!downItemUrlList.contains(downloadInfo.url)) {
                                 downItemUrlList.add(downloadInfo.url);
                                 downloadInfoList.add(downloadInfo);
+                                position = downItemUrlList.size() - 1;
                             } else {
                                 position = downItemUrlList.indexOf(downloadInfo.url);
                                 downloadInfoList.set(position, downloadInfo);
@@ -194,12 +193,26 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                                 downloadItemRecyclerView.setAdapter(recyclerAdapter);
                             } else {
                                 recyclerAdapter.setDownloadInfoList(downloadInfoList);
-                                recyclerAdapter.notifyItemChanged(position);
+
+                                recyclerAdapter.notifyDataSetChanged();
+//                                if (downItemUrlList.contains(downloadInfo.url)){
+//                                    recyclerAdapter.notifyItemChanged(position);
+//                                } else {
+//                                    recyclerAdapter.notifyItemInserted(position);
+//                                }
                             }
                         } else {
                             downloadInfo.downloadState = DownloadInfo.DOWNLOAD_FINISH;
-                            position = downItemUrlList.indexOf(downloadInfo.url);
-                            downloadInfoList.set(position, downloadInfo);
+                            if (downloadInfoList.size() != 0) {
+                                if (downItemUrlList.contains(downloadInfo.url)){
+                                    position = downItemUrlList.indexOf(downloadInfo.url);
+                                } else {
+                                    position = downItemUrlList.size() - 1;
+                                }
+                                downloadInfoList.set(position, downloadInfo);
+                            } else {
+                                downloadInfoList.add(downloadInfo);
+                            }
 
                             recyclerAdapter.setDownloadInfoList(downloadInfoList);
                             recyclerAdapter.notifyItemChanged(position);
@@ -208,7 +221,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
                     @Override
                     public void onFail(String url) {
-//                        downloaderList.get()
                         int position = downItemUrlList.indexOf(url);
 
                         DownloadInfo downloadInfo = new DownloadInfo();
@@ -217,11 +229,15 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                         downloadInfo.fileSize = downloadManager.getFileLength();
                         downloadInfo.downloadState = DownloadInfo.DOWNLOAD_FAIL;
 
-                        downloadInfoList.set(position,downloadInfo);
+                        if (downloadInfoList.size() != 0) {
+                            downloadInfoList.set(position, downloadInfo);
+                        } else {
+                            downloadInfoList.add(downloadInfo);
+                        }
                         recyclerAdapter.setDownloadInfoList(downloadInfoList);
                         recyclerAdapter.notifyItemChanged(position);
 
-                        Toast.makeText(MainActivity.this,url + " download failed",Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, url + " download failed", Toast.LENGTH_LONG).show();
                     }
                 });
             }

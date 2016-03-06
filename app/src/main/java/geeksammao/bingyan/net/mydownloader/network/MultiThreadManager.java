@@ -2,9 +2,9 @@ package geeksammao.bingyan.net.mydownloader.network;
 
 import android.accounts.NetworkErrorException;
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
+import android.os.Looper;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -29,7 +29,7 @@ import geeksammao.bingyan.net.mydownloader.network.task.DownloadTask;
 public class MultiThreadManager {
     private DatabaseManager databaseManager;
     private final int CORE_NUM = Runtime.getRuntime().availableProcessors();
-    private ExecutorService dbExecutorService = Executors.newFixedThreadPool(9);
+    //    private ExecutorService dbExecutorService = Executors.newFixedThreadPool(3);
     private ExecutorService taskExecutorService = Executors.newFixedThreadPool(CORE_NUM + 1);
 
     private int threadNum;
@@ -40,26 +40,27 @@ public class MultiThreadManager {
     private int downloadedLength;
     private long block;
     private File saveDir;
+    private File oldSaveDir;
     private String fileName;
-    private int retryNum;
-
-    private Activity activity;
 
     private DownloadTask[] downloadTasks;
+    private Handler mainHandler;
     private Map<Integer, Long> downloadedLengthMap = new HashMap<>();
 
-    public MultiThreadManager(int threadNum, String targetUrl, File saveDir, Context context) {
+    public MultiThreadManager(int threadNum, String targetUrl, File saveDir, Activity activity) {
         this.threadNum = threadNum;
         this.targetUrl = targetUrl;
         this.saveDir = saveDir;
-        databaseManager = DatabaseManager.getInstance(context);
+        oldSaveDir = saveDir;
+        this.mainHandler = new Handler(Looper.myLooper());
+        databaseManager = DatabaseManager.getInstance(activity.getApplicationContext());
 
-        this.activity = (Activity) context;
         downloadTasks = new DownloadTask[threadNum];
     }
 
     public void setTargetUrl(String targetUrl) {
         this.targetUrl = targetUrl;
+        this.saveDir = oldSaveDir;
     }
 
     public void initDownload(final OnDownloadCallback callback) {
@@ -68,66 +69,81 @@ public class MultiThreadManager {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                int length;
-
-                try {
-                    HttpUtil httpUtil = HttpUtil.getInstance();
-                    RequestResult<Bundle> requestResult = httpUtil.getHeadFieldForDownload(targetUrl);
-
-                    if (requestResult.getStatus() == 200) {
-                        Bundle bundle = requestResult.getMultiData();
-                        boolean rangeAccept = ("bytes").equals(bundle.getString("accept_range"));
-                        length = bundle.getInt("length");
-                        fileName = bundle.getString("name");
-                        String etag = bundle.getString("etag");
-                        saveDir = new File(saveDir, fileName);
-
-                        if (length <= 0) {
-                            activity.runOnUiThread(
-                                    new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            callback.onDownloadError();
-                                        }
-                                    }
-                            );
-                            throw new NetworkErrorException("File size error");
-                        }
-                        setFileLength(length);
-
-                        activity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                callback.onDownloadStart();
-                            }
-                        });
-
-                        if (rangeAccept) {
-                            isMultiThreadEnabled = false;
-//                            isMultiThreadEnabled = true;
-//                            initForMultiThreadDownload(length, callback);
-                        } else {
-                            isMultiThreadEnabled = false;
-                        }
-                    } else {
-                        activity.runOnUiThread(
-                                new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        callback.onDownloadError();
-                                    }
-                                }
-                        );
-                        throw new NetworkErrorException("Network error with error code " + requestResult.getStatus());
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                initNewDownload(callback);
             }
         }).start();
     }
 
-    private void downloadWithSingleThread(long totalFileLength,final OnProgressUpdateCallback callback) {
+    private void initNewDownload(final OnDownloadCallback callback) {
+        try {
+            HttpUtil httpUtil = HttpUtil.getInstance();
+            RequestResult<Bundle> requestResult = httpUtil.getHeadFieldForDownload(targetUrl);
+
+            if (requestResult.getStatus() == 200) {
+                onGetHeaderSuccess(callback, requestResult);
+            } else {
+                onGetHeaderError(callback, requestResult);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void onGetHeaderSuccess(final OnDownloadCallback callback, RequestResult<Bundle> requestResult) throws NetworkErrorException {
+        int length;
+        Bundle bundle = requestResult.getMultiData();
+        boolean rangeAccept = ("bytes").equals(bundle.getString("accept_range"));
+        length = bundle.getInt("length");
+        fileName = bundle.getString("name");
+        String etag = bundle.getString("etag");
+        String lastModified = bundle.getString("last_modified");
+        saveDir = new File(saveDir, fileName);
+
+        if (length <= 0) {
+            onDownloadLengthError(callback);
+        }
+        setFileLength(length);
+
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                callback.onDownloadStart();
+            }
+        });
+
+        if (rangeAccept) {
+            isMultiThreadEnabled = true;
+            initForMultiThreadDownload(length, callback);
+        } else {
+            isMultiThreadEnabled = false;
+        }
+    }
+
+    private void onDownloadLengthError(final OnDownloadCallback callback) throws NetworkErrorException {
+        mainHandler.post(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.onDownloadError();
+                    }
+                }
+        );
+        throw new NetworkErrorException("File size error");
+    }
+
+    private void onGetHeaderError(final OnDownloadCallback callback, RequestResult<Bundle> requestResult) throws NetworkErrorException {
+        mainHandler.post(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.onDownloadError();
+                    }
+                }
+        );
+        throw new NetworkErrorException("Network error with error code " + requestResult.getStatus());
+    }
+
+    private void downloadWithSingleThread(long totalFileLength, final OnProgressUpdateCallback callback) {
         int totalDownloadLength = 0;
         HttpUtil httpUtil = HttpUtil.getInstance();
         RequestResult<InputStream> result = httpUtil.getInputStream(targetUrl);
@@ -148,10 +164,10 @@ public class MultiThreadManager {
             try {
                 while ((length = bufferedInputStream.read(buffer, 0, buffer.length)) != -1) {
                     totalDownloadLength += length;
-                    final int progress = totalDownloadLength/(int)totalFileLength;
+                    final int progress = totalDownloadLength / (int) totalFileLength;
                     Thread.sleep(500);
                     fileOutputStream.write(buffer);
-                    activity.runOnUiThread(new Runnable() {
+                    mainHandler.post(new Runnable() {
                         @Override
                         public void run() {
                             callback.setProgress(progress);
@@ -234,8 +250,7 @@ public class MultiThreadManager {
                                 }
 
                                 if (downloadTasks[i].isTaskFailed() && callback != null) {
-                                    Log.e("sam", "task fail");
-                                    activity.runOnUiThread(new Runnable() {
+                                    mainHandler.post(new Runnable() {
                                         @Override
                                         public void run() {
                                             callback.onFail(targetUrl);
@@ -252,10 +267,10 @@ public class MultiThreadManager {
                             if (downloadedLength >= fileLength) {
                                 isFinished = true;
                             }
-                            activity.runOnUiThread(new Runnable() {
+                            mainHandler.post(new Runnable() {
                                 @Override
                                 public void run() {
-//                                    callback.setProgress(progress);
+                                    callback.setProgress(progress);
                                 }
                             });
                         }
@@ -266,7 +281,7 @@ public class MultiThreadManager {
                     }
 
                 } else {
-                    downloadWithSingleThread(fileLength,callback);
+                    downloadWithSingleThread(fileLength, callback);
                 }
             }
         }).start();
@@ -297,7 +312,7 @@ public class MultiThreadManager {
     }
 
     public void updateDB() {
-        dbExecutorService.execute(new Runnable() {
+        taskExecutorService.execute(new Runnable() {
             @Override
             public void run() {
                 databaseManager.update(targetUrl, downloadedLengthMap);
@@ -337,9 +352,9 @@ public class MultiThreadManager {
         return threadNum;
     }
 
-    public synchronized ExecutorService getDbExecutorService() {
-        return dbExecutorService;
-    }
+//    public synchronized ExecutorService getDbExecutorService() {
+//        return dbExecutorService;
+//    }
 
     public String getFileName() {
         return fileName;
@@ -362,7 +377,7 @@ public class MultiThreadManager {
     }
 
     public void shutdownNow() {
-        dbExecutorService.shutdownNow();
+//        dbExecutorService.shutdownNow();
         taskExecutorService.shutdownNow();
     }
 }

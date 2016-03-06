@@ -2,9 +2,9 @@ package geeksammao.bingyan.net.mydownloader.network;
 
 import android.os.Bundle;
 
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
+//import com.squareup.okhttp.OkHttpClient;
+//import com.squareup.okhttp.Request;
+//import com.squareup.okhttp.Response;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -231,32 +231,32 @@ public class HttpUtil {
         urlConnection.setDefaultUseCaches(true);
     }
 
-    public RequestResult<InputStream> getInputStreamWithOkhttp(String targetUrl) {
-        RequestResult<InputStream> requestResult = new RequestResult<>();
-
-        final OkHttpClient client = new OkHttpClient();
-        int maxStale = 60 * 60 * 24 * 28;
-        Request request = new Request.Builder().url(targetUrl).
-                header("Range", "bytes=" + startPosition + "-" + endPosition).
-                addHeader("Accept-Ranges", "bytes").
-                build();
-
-        try {
-            Response response = client.newCall(request).execute();
-            if (response.isSuccessful()) {
-                requestResult.setStatus(HTTP_PARTIAL);
-                requestResult.setData(response.body().byteStream());
-            } else {
-                Logger.logString(this, "response is error");
-                requestResult.setStatus(response.code());
-                requestResult.setData(null);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return requestResult;
-    }
+//    public RequestResult<InputStream> getInputStreamWithOkhttp(String targetUrl) {
+//        RequestResult<InputStream> requestResult = new RequestResult<>();
+//
+//        final OkHttpClient client = new OkHttpClient();
+//        int maxStale = 60 * 60 * 24 * 28;
+//        Request request = new Request.Builder().url(targetUrl).
+//                header("Range", "bytes=" + startPosition + "-" + endPosition).
+//                addHeader("Accept-Ranges", "bytes").
+//                build();
+//
+//        try {
+//            Response response = client.newCall(request).execute();
+//            if (response.isSuccessful()) {
+//                requestResult.setStatus(HTTP_PARTIAL);
+//                requestResult.setData(response.body().byteStream());
+//            } else {
+//                Logger.logString(this, "response is error");
+//                requestResult.setStatus(response.code());
+//                requestResult.setData(null);
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        return requestResult;
+//    }
 
     public String getFileName(String url) {
         String filename = "";
@@ -320,6 +320,7 @@ public class HttpUtil {
                     bundle.putInt("length",urlConnection.getContentLength());
                     bundle.putString("accept_range",urlConnection.getHeaderField("Accept-Ranges"));
                     bundle.putString("etag",urlConnection.getHeaderField("ETag"));
+                    bundle.putString("last_modified",urlConnection.getHeaderField("last-modified"));
                     requestResult.setMultiData(bundle);
                     break;
                 case HttpURLConnection.HTTP_CLIENT_TIMEOUT:
